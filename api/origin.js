@@ -125,6 +125,33 @@ require('org.pinf.genesis.lib/lib/api').forModule(require, module, function (API
 	            decrypted += decrypt.final('utf8');
 	            return decrypted;
 	        });
+		},
+
+		makeInviteToken: function () {
+			var self = this;
+			// TODO: Move implementation to './api/origin/get-invite-token' and use here.
+			return self.getSecretCodeHash().then(function (secretCodeHash) {
+				var code = (Math.floor(Math.random()*9000) + 1000);
+				var token = API.JWT.sign(
+					{
+						secretCodeHash: secretCodeHash.toString('base64')
+					},
+					// TODO: Use more than just the 'code' as secret.
+					//       Also tie to authority.
+					"invite:__StAbLe_RaNdOm__:" + code, {
+						expiresInMinutes: 5
+					}
+				);
+
+console.log("AFTER", API.JWT.verify(token,
+	"invite:__StAbLe_RaNdOm__:" + code
+));
+
+				return {
+					token: token,
+					code: code
+				};
+			});
 		}
 	}
 
@@ -163,6 +190,11 @@ require('org.pinf.genesis.lib/lib/api').forModule(require, module, function (API
 		self.decrypt = function (data) {
 			return privateAPI().then(function (api) {
 				return api.decryptWithCode(data);
+			});
+		}
+		self.getInviteToken = function () {
+			return privateAPI().then(function (api) {
+				return api.makeInviteToken();
 			});
 		}
 

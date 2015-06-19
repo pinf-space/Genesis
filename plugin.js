@@ -12,18 +12,20 @@ exports.for = function (API) {
 //console.log("RAN!!!", resolvedConfig['$space.pinf.genesis/access/0']);
 //console.log("RAN!!!", resolvedConfig['$space.pinf.genesis/access/0'].hello());
 
+resolvedConfig.t = Date.now();
+
 			return resolvedConfig;
 		});
 	}
 
 	exports.turn = function (resolvedConfig) {
 
-		return API.Q.denodeify(function (callback) {
+		var origin = resolvedConfig["$space.pinf.genesis/origin/0"];
 
-//console.log ("TURN PIO PROFILE", resolvedConfig);
+		return origin.getInviteToken().then(function (token) {
 
-			return callback(null);
-		})();
+			console.log("Invite token", token);
+		});
 	}
 
 	return exports;
