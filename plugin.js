@@ -22,9 +22,11 @@ resolvedConfig.t = Date.now();
 
 		var origin = resolvedConfig["$space.pinf.genesis/origin/0"];
 
-		return origin.getInviteToken().then(function (token) {
+		return origin.getInviteSecretsToken().then(function (secrets) {
 
-			console.log("Invite token", token);
+			console.log("Invite token code:", secrets.code);
+
+			process.stdout.write(secrets.token + "\n");
 		});
 	}
 

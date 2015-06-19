@@ -127,14 +127,20 @@ require('org.pinf.genesis.lib/lib/api').forModule(require, module, function (API
 	        });
 		},
 
-		makeInviteToken: function () {
+		makeInviteSecretsToken: function () {
 			var self = this;
 			// TODO: Move implementation to './api/origin/get-invite-token' and use here.
 			return self.getSecretCodeHash().then(function (secretCodeHash) {
+
+        		var store = API.EXTEND(true, {}, self.stores.primary);
+        		delete store['@impl'];
+
 				var code = (Math.floor(Math.random()*9000) + 1000);
 				var token = API.JWT.sign(
+					// TODO: Use storage implementation to also add ata here.
 					{
-						secretCodeHash: secretCodeHash.toString('base64')
+						secretCodeHash: secretCodeHash.toString('base64'),
+						store: store
 					},
 					// TODO: Use more than just the 'code' as secret.
 					//       Also tie to authority.
@@ -143,13 +149,9 @@ require('org.pinf.genesis.lib/lib/api').forModule(require, module, function (API
 					}
 				);
 
-console.log("AFTER", API.JWT.verify(token,
-	"invite:__StAbLe_RaNdOm__:" + code
-));
-
 				return {
-					token: token,
-					code: code
+					token: "-" + new Buffer(token).toString("base64") + "-",
+					code: "-" + code + "-"
 				};
 			});
 		}
@@ -192,9 +194,9 @@ console.log("AFTER", API.JWT.verify(token,
 				return api.decryptWithCode(data);
 			});
 		}
-		self.getInviteToken = function () {
+		self.getInviteSecretsToken = function () {
 			return privateAPI().then(function (api) {
-				return api.makeInviteToken();
+				return api.makeInviteSecretsToken();
 			});
 		}
 
