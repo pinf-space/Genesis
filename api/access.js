@@ -33,7 +33,9 @@ require('org.pinf.genesis.lib/lib/api').forModule(require, module, function (API
 
 		var privateConfig = {
 			origin: origin
-		}
+		};
+	    // TODO: Make store credentials private when we can sign requests so
+	    //       we don't leak credentials to say io.pinf.pio.profile.
 
 		function privateAPI () {
 			return Access_PRIVATE.ready(self, privateConfig);

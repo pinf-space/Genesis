@@ -5,6 +5,11 @@ PINF.Space Genesis
 
 Each information space needs a virtual point of origin to attach data to. This component provides such a point of origin along with a cryptographic model that protects the data.
 
+PINF.Spaces are compatible with the following technologies:
+
+  * [Public-key Cryptography](https://en.wikipedia.org/wiki/Public-key_cryptography)
+  * [Colored coins and Open Assets](https://github.com/OpenAssets) *(Bitcoin blockchain)*
+
 
 Model
 -----
@@ -16,7 +21,9 @@ Model
   * `<PINF.Space.Authority.ID>` is:
     * A *hostname* or *ip* for **public** web spaces
     * A *hash* or *other* for **internal** spaces
-
+  * A `<PINF.Space.Authority.ID>` may:
+    * Enforce uniqueness and control if it tracks all spaces
+    * Attempt uniqueness and protect privacy if it does not track spaces
 
 Structures
 ----------
