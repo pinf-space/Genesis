@@ -19,7 +19,8 @@
           "Q": "q",
           "CRYPTO": "crypto",
           "JWT": "jsonwebtoken",
-          "INQUIRER": "inquirer"
+          "INQUIRER": "inquirer",
+          "SSH": "./ssh.js"
         }
       }
     }

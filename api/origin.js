@@ -2,6 +2,8 @@
 
 require('org.pinf.genesis.lib/lib/api').forModule(require, module, function (API, exports) {
 
+	const SSH = API.SSH.for(API);
+
 
 	const Origin_PRIVATE = {
 
