@@ -91,6 +91,25 @@ require('org.pinf.genesis.lib/lib/api').forModule(require, module, function (API
 			});
 		},
 
+		derivePublicOpenSSH: function () {
+			var self = this;
+			return API.Q.fcall(function () {
+				// TODO: Cache this if private key path and value has not changed.
+				var privateKey = API.FS.readFileSync(self.secret.keyPath, "utf8");
+				var privateKeyObject = API.FORGE.pki.privateKeyFromAsn1(
+					API.FORGE.asn1.fromDer(
+						API.FORGE.util.decode64(
+							privateKey
+							.match(/^-----BEGIN RSA PRIVATE KEY-----\n([^-]+)\n-----END RSA PRIVATE KEY-----\n?$/)[1]
+							.replace(/\n/g, "")
+						)
+					)
+				);
+				var publicKeyObject = API.FORGE.pki.rsa.setPublicKey(privateKeyObject.n, privateKeyObject.e);
+				return API.Q.resolve(API.FORGE.ssh.publicKeyToOpenSSH(publicKeyObject));
+			});
+		},
+
 		getSecretCode: function () {
 			var self = this;
 			return API.Q.reject(new Error("'getSecretCode' must be implemented by @impl!"));
@@ -186,6 +205,11 @@ require('org.pinf.genesis.lib/lib/api').forModule(require, module, function (API
 				return api.derivePublicPem();
 			});
 		}
+		self.getPublicOpenSSH = function () {
+			return privateAPI().then(function (api) {
+				return api.derivePublicOpenSSH();
+			});
+		}
 		self.encrypt = function (data) {
 			return privateAPI().then(function (api) {
 				return api.encryptWithCode(data);
@@ -210,10 +234,16 @@ require('org.pinf.genesis.lib/lib/api').forModule(require, module, function (API
 
 				self.public.keyPath = publicKeyPath;
 
-				return self.getPublicPem().then(function (pem) {
+				return self.getPublicPem().then(function (keyPem) {
 
-					self.public.pem = pem;
+					self.public.keyPem = keyPem;
 
+					return self.getPublicOpenSSH().then(function (keyOpenSSH) {
+
+						self.public.keyOpenSSH = keyOpenSSH;
+
+						return null;
+					});
 				});
 			}).then(function () {
 
@@ -224,7 +254,6 @@ require('org.pinf.genesis.lib/lib/api').forModule(require, module, function (API
 
 
 	exports.PLComponent = function (config, groupConfig) {
-		
 		return API.EXTEND(true, new Origin(config), config).ready().then(function (origin) {
 			return {
 				// POLICY: Use '$' prefix to signify that config has been resolved.

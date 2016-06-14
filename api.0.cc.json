@@ -1,0 +1,7 @@
+{
+    "@": {
+        "space.pinf.genesis/origin/0": {
+            "$": "./api/origin.cc.json"
+        }
+    }
+}
